@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SCL xmlns="http://iec.ch">
+  <Header id="" nameStructure="IEDName" />
+  <IED name="TEMPLATE">
+    <Services>
+      <DynAssociation />
+      <GetDirectory />
+      <GetDataObjectDefinition />
+      <GetDataSetValue />
+      <DataSetDirectory />
+      <ReadWrite />
+      <GetCBValues />
+      <ConfLNs fixPrefix="true" fixLnInst="true" />
+      <ReportSettings cbName="Conf" datSet="Dyn" rptID="Dyn" optFields="Dyn" bufTime="Dyn" trgOps="Dyn" intgPd="Dyn" owner="true" />
+    </Services>
+    <AccessPoint name="accessPoint1">
+      <Server>
+        <Authentication />
+        <LDevice inst="GenericIO">
+          <LN0 lnClass="LLN0" lnType="LLN01" inst="">
+              <DataSet name="StatusIED_Server_mms" desc="Monitoramento 4 bits IED-Server-mms">
+                <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="Ind1" daName="stVal" />
+                <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="Ind2" daName="stVal" />
+                <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="Ind3" daName="stVal" />
+                <FCDA ldInst="GenericIO" lnClass="GGIO" fc="ST" lnInst="1" doName="Ind4" daName="stVal" />
+              </DataSet>
+              <ReportControl name="StatusRCB" confRev="1" datSet="StatusIED_Server_mms" rptID="StatusIED_Server_mms" buffered="true" intgPd="1000" bufTime="50">
+                <TrgOps dchg="true" period="true" />
+                <OptFields seqNum="true" timeStamp="true" dataSet="true" reasonCode="true" configRef="true" />
+                <RptEnabled max="2" />
+              </ReportControl>
+            <DOI name="Mod">
+              <DAI name="stVal"><Val>on</Val></DAI>
+              <DAI name="ctlModel"><Val>status-only</Val></DAI>
+            </DOI>
+            <DOI name="Beh">
+              <DAI name="stVal"><Val>on</Val></DAI>
+            </DOI>
+            <DOI name="Health">
+              <DAI name="stVal"><Val>ok</Val></DAI>
+            </DOI>
+            <DOI name="NamPlt">
+              <DAI name="vendor"><Val>Zilocchi</Val></DAI>
+              <DAI name="swRev"><Val>1.0.0</Val></DAI>
+              <DAI name="d"><Val>IED Monitor 4 Bits</Val></DAI>
+            </DOI>
+          </LN0>
+          <LN lnClass="LPHD" lnType="LPHD1" inst="1" prefix="">
+            <DOI name="PhyHealth">
+              <DAI name="stVal"><Val>ok</Val></DAI>
+            </DOI>
+          </LN>
+          <LN lnClass="GGIO" lnType="GGIO1" inst="1" prefix="">
+            <DOI name="Mod">
+              <DAI name="stVal"><Val>on</Val></DAI>
+              <DAI name="ctlModel"><Val>status-only</Val></DAI>
+            </DOI>
+            <DOI name="Beh">
+              <DAI name="stVal"><Val>on</Val></DAI>
+            </DOI>
+            <DOI name="Health">
+              <DAI name="stVal"><Val>ok</Val></DAI>
+            </DOI>
+            <DOI name="Ind1">
+              <DAI name="d"><Val>S1</Val></DAI>
+            </DOI>
+            <DOI name="Ind2">
+              <DAI name="d"><Val>S2</Val></DAI>
+            </DOI>
+            <DOI name="Ind3">
+              <DAI name="d"><Val>S3</Val></DAI>
+            </DOI>
+            <DOI name="Ind4">
+              <DAI name="d"><Val>U&lt;</Val></DAI>
+            </DOI>
+          </LN>
+        </LDevice>
+      </Server>
+    </AccessPoint>
+  </IED>
+  <DataTypeTemplates>
+    <LNodeType id="LLN01" lnClass="LLN0">
+      <DO name="Mod" type="ENC_1_Mod" />
+      <DO name="Beh" type="ENS_1_Beh" />
+      <DO name="Health" type="ENS_2_Health" />
+      <DO name="NamPlt" type="LPL_1_NamPlt" />
+    </LNodeType>
+    <LNodeType id="LPHD1" lnClass="LPHD">
+      <DO name="PhyNam" type="DPL_1_PhyNam" />
+      <DO name="PhyHealth" type="ENS_2_Health" />
+      <DO name="Proxy" type="SPS_1" />
+    </LNodeType>
+    <LNodeType id="GGIO1" lnClass="GGIO">
+      <DO name="Mod" type="ENC_1_Mod" />
+      <DO name="Beh" type="ENS_1_Beh" />
+      <DO name="Health" type="ENS_2_Health" />
+      <DO name="NamPlt" type="LPL_2_NamPlt" />
+      <DO name="Ind1" type="SPS_1" />
+      <DO name="Ind2" type="SPS_1" />
+      <DO name="Ind3" type="SPS_1" />
+      <DO name="Ind4" type="SPS_1" />
+    </LNodeType>
+    <DOType id="ENC_1_Mod" cdc="ENC">
+      <DA name="stVal" bType="Enum" type="Beh" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="ctlModel" type="CtlModels" bType="Enum" fc="CF" />
+    </DOType>
+    <DOType id="ENS_1_Beh" cdc="ENS">
+      <DA name="stVal" bType="Enum" type="Beh" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+    </DOType>
+    <DOType id="ENS_2_Health" cdc="ENS">
+      <DA name="stVal" bType="Enum" type="HealthKind" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+    </DOType>
+    <DOType id="LPL_1_NamPlt" cdc="LPL">
+      <DA name="vendor" bType="VisString255" fc="DC" />
+      <DA name="swRev" bType="VisString255" fc="DC" />
+      <DA name="d" bType="VisString255" fc="DC" />
+      <DA name="configRev" bType="VisString255" fc="DC" />
+      <DA name="ldNs" bType="VisString255" fc="EX" />
+    </DOType>
+    <DOType id="DPL_1_PhyNam" cdc="DPL">
+      <DA name="vendor" bType="VisString255" fc="DC" />
+    </DOType>
+    <DOType id="SPS_1" cdc="SPS">
+      <DA name="stVal" bType="BOOLEAN" fc="ST" dchg="true" />
+      <DA name="q" bType="Quality" fc="ST" qchg="true" />
+      <DA name="t" bType="Timestamp" fc="ST" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+    <DOType id="LPL_2_NamPlt" cdc="LPL">
+      <DA name="vendor" bType="VisString255" fc="DC" />
+      <DA name="swRev" bType="VisString255" fc="DC" />
+      <DA name="d" bType="VisString255" fc="DC" />
+    </DOType>
+    <EnumType id="Beh">
+      <EnumVal ord="1">on</EnumVal>
+      <EnumVal ord="2">blocked</EnumVal>
+      <EnumVal ord="3">test</EnumVal>
+      <EnumVal ord="4">test/blocked</EnumVal>
+      <EnumVal ord="5">off</EnumVal>
+    </EnumType>
+    <EnumType id="HealthKind">
+      <EnumVal ord="1">ok</EnumVal>
+      <EnumVal ord="2">warning</EnumVal>
+      <EnumVal ord="3">alarm</EnumVal>
+    </EnumType>
+    <EnumType id="CtlModels">
+      <EnumVal ord="0">status-only</EnumVal>
+    </EnumType>
+  </DataTypeTemplates>
+</SCL>
