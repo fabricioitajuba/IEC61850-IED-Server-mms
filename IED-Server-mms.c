@@ -68,7 +68,6 @@ void sigint_handler(int signalId){
 }
 
 static void connectionHandler(IedServer self, ClientConnection connection, bool connected, void* parameter){
-
     if (connected)
         LOG_DEBUG("[IED-Server-mms] Cliente conectado!\n");
     else
@@ -108,11 +107,52 @@ controlHandlerForBinaryOutput(ControlAction action, void* parameter, MmsValue* v
     return CONTROL_RESULT_OK;
 }
 
+/* [NOVO] Configura dinamicamente o Dataset e o RCB no modelo existente */
+static void setupDataSetAndRCB(void) {
+    LogicalNode* ggio1 = IEDMODEL_GenericIO_GGIO1;
+    if (!ggio1) {
+        printf("[ERRO] Logical Node GGIO1 nao encontrado!\n");
+        return;
+    }
+
+    /* 1. Cria o DataSet usando o formato MMS completo: LN$FC$DO$DA */
+    DataSet* dsEventos = DataSet_create("DS_Eventos", ggio1);
+    DataSetEntry_create(dsEventos, "GGIO1$ST$Ind1$stVal", -1, NULL);
+    DataSetEntry_create(dsEventos, "GGIO1$ST$Ind2$stVal", -1, NULL);
+    DataSetEntry_create(dsEventos, "GGIO1$ST$Ind3$stVal", -1, NULL);
+    DataSetEntry_create(dsEventos, "GGIO1$ST$Ind4$stVal", -1, NULL);
+    DataSetEntry_create(dsEventos, "GGIO1$ST$DPCSO1$stVal", -1, NULL);
+    DataSetEntry_create(dsEventos, "GGIO1$MX$AnIn1$mag$f", -1, NULL);
+
+    /* 2. Cria o Unbuffered RCB (URCB) - apenas "DS_Eventos" (relativo a ggio1) */
+    ReportControlBlock_create(
+        "urcbEventos",
+        ggio1,
+        "RptUnbuf01",
+        false,                  /* false = Unbuffered (URCB) */
+        "DS_Eventos",           /* <-- Apenas o nome do DataSet dentro de GGIO1 */
+        1, 11, 15, 50, 5000
+    );
+
+    /* 3. Cria o Buffered RCB (BRCB) - apenas "DS_Eventos" (relativo a ggio1) */
+    ReportControlBlock_create(
+        "brcbEventos",
+        ggio1,
+        "RptBuf01",
+        true,                   /* true = Buffered (BRCB) */
+        "DS_Eventos",           /* <-- Apenas o nome do DataSet dentro de GGIO1 */
+        1, 11, 15, 50, 5000
+    );
+}
+
 int main(int argc, char** argv) {
 
     int tcpPort = (argc > 1) ? atoi(*(argv + 1)) : 102;
 
     LOG_DEBUG("Iniciando servidor IEC 61850 IED-Server-mms (libIEC61850 %s)...\n", LibIEC61850_getVersionString());
+
+    /* [NOVO] Adiciona DataSet e RCB antes de criar o IedServer */
+    setupDataSetAndRCB();
 
     IedServerConfig config = IedServerConfig_create();
     IedServerConfig_setEdition(config, IEC_61850_EDITION_2);
@@ -222,15 +262,12 @@ int main(int argc, char** argv) {
 
         /* Atualiza String Visível (VisString255) */
         IedServer_updateVisibleStringAttributeValue(iedServer, IED_STR_VAL, textoStatus);
-
         IedServer_unlockDataModel(iedServer);
-
         Thread_sleep(1000);
     }
 
     LOG_DEBUG("\nEncerrando servidor IED-Server-mms...\n");
     IedServer_stop(iedServer);
     IedServer_destroy(iedServer);
-
     return 0;
 }
